@@ -1,26 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { createCallSignature } from "typescript";
+import { generateMatrix } from "./helpers/generateData";
+import { useSheet, UseSheetResult } from "./hooks/useSheet";
+import logo from "./logo.svg";
+import "./App.css";
+const data = generateMatrix(10);
 
-function App() {
+const App = () => {
+  const { sheetAttributes, rows } = useSheet<number>({
+    data,
+    onCellUpdated: (...rest) => {
+      console.log(rest);
+    },
+    onContextMenu: (ev) => {
+      console.log(ev);
+    },
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="sheet" {...sheetAttributes}>
+        {rows.map(({ rowAttributes, cells }) => (
+          <div className="row" {...rowAttributes}>
+            {cells.map((c) => (
+              <div
+                {...c.cellAttributes}
+                className={`cell ${c.isActive ? "active" : ""}`}
+              >
+                {c.value}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
